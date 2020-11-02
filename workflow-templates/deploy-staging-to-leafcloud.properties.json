@@ -1,0 +1,5 @@
+{
+  "name": "Deploy Staging to LeafCloud",
+  "description": "Automatically deploys staging branch to LeafCloud, at https://[reponame].staging.random.studio.",
+  "iconName": "example-icon"
+}
