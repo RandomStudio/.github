@@ -1,4 +1,4 @@
-name: Deploy Staging to LeafCloud
+name: Deploy branch to LeafCloud
 on:
   push:
     branches:
@@ -15,6 +15,10 @@ jobs:
       SSH_KEY: ${{ secrets.SSH_KEY }}
       TARGET_DIR: ${{ github.event.repository.name }}
     steps:
+      - id: TARGET_DIR_LOWERCASE
+        uses: ASzc/change-string-case-action@v1
+        with:
+          string: ${{ github.event.repository.name }}
       - uses: actions/checkout@v1
       - name: Install dependencies
         run: yarn
@@ -31,13 +35,12 @@ jobs:
           username: ${{ env.SSH_USERNAME }}
           key: ${{ env.SSH_KEY }}
           port: 22
-          script: mkdir -p /var/www/staging.random.studio/${{ env.TARGET_DIR }}
+          script: mkdir -p /var/www/staging.random.studio/${{ steps.string.outputs.TARGET_DIR_LOWERCASE }}
       - name: Deploy preview
-        if: github.ref == 'refs/heads/staging'
         uses: AEnterprise/rsync-deploy@1.0.1
         env:
           ARGS: "-e -c -r --delete"
           DEPLOY_KEY: ${{ env.SSH_KEY }}
           USERNAME: ${{ env.SSH_USERNAME }}
           FOLDER: "./${{ env.BUILD_DIR }}/"
-          SERVER_DESTINATION: '/var/www/staging.random.studio/${{ env.TARGET_DIR }}/'
+          SERVER_DESTINATION: '/var/www/staging.random.studio/${{ steps.string.outputs.TARGET_DIR_LOWERCASE }}/'
